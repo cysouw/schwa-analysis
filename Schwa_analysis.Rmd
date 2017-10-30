@@ -17,7 +17,7 @@ library(lme4)
 Read the data from the Excel file. Clean various typos and mark data consistently.
 
 ```{r}
-data <- read_excel("Schwa data.xls")
+data <- read_excel("Schwa annotated data.xls")
 
 data[data=="0.000000"] <- NA
 data[data=="?"] <- NA
@@ -247,7 +247,7 @@ levels(dataSel$schwa) <- c("no schwa", "with schwa")
 levels(dataSel$stress) <- c("stressed", "not stressed")
 ```
 
-## Table 13: Logistic regression with all two-way interactions.
+### Table 13: Logistic regression with all two-way interactions.
 
 ```{r}
 model <- schwa ~ ( lexeme + segment + stress + boundary + position )^2
@@ -277,7 +277,9 @@ chisq.test(table(dataSel$position, dataSel$boundary, dataSel$schwa)[,,2])$residu
 
 The two words behave really different: therefore we decided to split the data into two regressions and analyze 'gern(e)' and 'heut(e)' separately.
 
-Table 14/15: 'gern(e)'. There is a preference for no schwa before vowels, before unstressed, and at the start of the middlefield.
+###Table 14/15: 'gern(e)'
+
+There is a preference for no schwa before vowels, before unstressed, and at the start of the middlefield.
 
 ```{r}
 fitG <- glm(schwa ~ (segment + stress + boundary + position), data = dataSel, family = binomial, subset = lexeme=="gerne")
@@ -285,7 +287,9 @@ knitr::kable(anova(fitG, test = "Chi"))
 summary(fitG)
 ```
 
-Table 16/17: 'heut(e)'. There is a preference for no schwa before vowel, before phrase boundary and before prefield boundare
+### Table 16/17: 'heut(e)'
+
+There is a preference for no schwa before vowel, before phrase boundary and before prefield boundare
 
 ```{r}
 fitH <- glm(schwa ~ segment + stress + boundary + position, data = dataSel, family = binomial, subset = lexeme=="heute")
@@ -323,7 +327,7 @@ Treating the lexeme as a random factor including all two-way interactions
 model <- schwa ~ ( segment + stress + boundary + position )^2 + ( 1 | lexeme )
 fitRandInter <- glmer(model, data = dataSel, family = binomial)
 summary(fitRandInter)
-anova(fitRandInter)
+knitr::kable(anova(fitRandInter))
 ranef(fitRandInter)
 ```
 
@@ -340,11 +344,11 @@ fitRandBoundary <- glmer(schwa ~ segment + stress + boundary + position + ( 1 + 
 fitRandBoundary <- runAgain(fitRandBoundary)
 
 # not significant: both heute/gerne behave similar
-anova(fitRandBase, fitRandSegment)
+knitr::kable(anova(fitRandBase, fitRandSegment))
 # the others are significant: heute/gerne behave different
-anova(fitRandBase, fitRandStress) 
-anova(fitRandBase, fitRandPosition)
-anova(fitRandBase, fitRandBoundary)
+knitr::kable(anova(fitRandBase, fitRandStress) )
+knitr::kable(anova(fitRandBase, fitRandPosition))
+knitr::kable(anova(fitRandBase, fitRandBoundary))
 ```
 
 Direction of random effects is alike to the differences between the two logistic regression models

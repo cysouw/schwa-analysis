@@ -132,7 +132,7 @@ library(lme4)</code></pre>
 <div id="preparation-data-ingestion-and-cleaning" class="section level1">
 <h1>Preparation: data ingestion and cleaning</h1>
 <p>Read the data from the Excel file. Clean various typos and mark data consistently.</p>
-<pre class="r"><code>data &lt;- read_excel(&quot;Schwa data.xls&quot;)
+<pre class="r"><code>data &lt;- read_excel(&quot;Schwa annotated data.xls&quot;)
 
 data[data==&quot;0.000000&quot;] &lt;- NA
 data[data==&quot;?&quot;] &lt;- NA
@@ -467,8 +467,8 @@ dataSel &lt;- data.frame(lapply(dataSel,factor))
 levels(dataSel$lexeme) &lt;- c(&quot;gerne&quot;, &quot;heute&quot;)
 levels(dataSel$schwa) &lt;- c(&quot;no schwa&quot;, &quot;with schwa&quot;)
 levels(dataSel$stress) &lt;- c(&quot;stressed&quot;, &quot;not stressed&quot;)</code></pre>
-<div id="table-13-logistic-regression-with-all-two-way-interactions." class="section level2">
-<h2>Table 13: Logistic regression with all two-way interactions.</h2>
+<div id="table-13-logistic-regression-with-all-two-way-interactions." class="section level3">
+<h3>Table 13: Logistic regression with all two-way interactions.</h3>
 <pre class="r"><code>model &lt;- schwa ~ ( lexeme + segment + stress + boundary + position )^2
 fit &lt;- step(glm(model, data = dataSel, family = binomial))</code></pre>
 <pre><code>## Start:  AIC=2853
@@ -688,7 +688,9 @@ chisq.test(table(dataSel$position, dataSel$boundary, dataSel$schwa)[,,2])$residu
 <div id="separate-into-two-regressions" class="section level2">
 <h2>Separate into two regressions</h2>
 <p>The two words behave really different: therefore we decided to split the data into two regressions and analyze ‘gern(e)’ and ‘heut(e)’ separately.</p>
-<p>Table 14/15: ‘gern(e)’. There is a preference for no schwa before vowels, before unstressed, and at the start of the middlefield.</p>
+<div id="table-1415-gerne" class="section level3">
+<h3>Table 14/15: ‘gern(e)’</h3>
+<p>There is a preference for no schwa before vowels, before unstressed, and at the start of the middlefield.</p>
 <pre class="r"><code>fitG &lt;- glm(schwa ~ (segment + stress + boundary + position), data = dataSel, family = binomial, subset = lexeme==&quot;gerne&quot;)
 knitr::kable(anova(fitG, test = &quot;Chi&quot;))</code></pre>
 <table>
@@ -776,7 +778,10 @@ knitr::kable(anova(fitG, test = &quot;Chi&quot;))</code></pre>
 ## AIC: 1980.7
 ## 
 ## Number of Fisher Scoring iterations: 5</code></pre>
-<p>Table 16/17: ‘heut(e)’. There is a preference for no schwa before vowel, before phrase boundary and before prefield boundare</p>
+</div>
+<div id="table-1617-heute" class="section level3">
+<h3>Table 16/17: ‘heut(e)’</h3>
+<p>There is a preference for no schwa before vowel, before phrase boundary and before prefield boundare</p>
 <pre class="r"><code>fitH &lt;- glm(schwa ~ segment + stress + boundary + position, data = dataSel, family = binomial, subset = lexeme==&quot;heute&quot;)
 knitr::kable(anova(fitH, test = &quot;Chi&quot;))</code></pre>
 <table>
@@ -869,6 +874,7 @@ knitr::kable(anova(fitH, test = &quot;Chi&quot;))</code></pre>
 <pre><code>## [1] 0.09475899</code></pre>
 <pre class="r"><code>(heute &lt;- cor(as.numeric(fitH$model$schwa),predict(fitH, type=&quot;link&quot;))^2)</code></pre>
 <pre><code>## [1] 0.2644536</code></pre>
+</div>
 </div>
 </div>
 <div id="mixed-models" class="section level1">
@@ -965,12 +971,90 @@ summary(fitRandInter)</code></pre>
 ## Correlation matrix not shown by default, as p = 25 &gt; 12.
 ## Use print(x, correlation=TRUE)  or
 ##   vcov(x)     if you need it</code></pre>
-<pre class="r"><code>anova(fitRandInter)</code></pre>
-<div data-pagedtable="false">
-<script data-pagedtable-source type="application/json">
-{"columns":[{"label":["Df"],"name":[1],"type":["int"],"align":["right"]},{"label":["Sum Sq"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["Mean Sq"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["F value"],"name":[4],"type":["dbl"],"align":["right"]}],"data":[{"1":"1","2":"37.181066","3":"37.181066","4":"37.181066"},{"1":"1","2":"61.490425","3":"61.490425","4":"61.490425"},{"1":"3","2":"76.853062","3":"25.617687","4":"25.617687"},{"1":"2","2":"13.312585","3":"6.656293","4":"6.656293"},{"1":"1","2":"8.791986","3":"8.791986","4":"8.791986"},{"1":"3","2":"8.591819","3":"2.863940","4":"2.863940"},{"1":"2","2":"8.956021","3":"4.478010","4":"4.478010"},{"1":"3","2":"13.692041","3":"4.564014","4":"4.564014"},{"1":"2","2":"10.360280","3":"5.180140","4":"5.180140"},{"1":"6","2":"27.632893","3":"4.605482","4":"4.605482"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
-  </script>
-</div>
+<pre class="r"><code>knitr::kable(anova(fitRandInter))</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th></th>
+<th align="right">Df</th>
+<th align="right">Sum Sq</th>
+<th align="right">Mean Sq</th>
+<th align="right">F value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>segment</td>
+<td align="right">1</td>
+<td align="right">37.181066</td>
+<td align="right">37.181066</td>
+<td align="right">37.181066</td>
+</tr>
+<tr class="even">
+<td>stress</td>
+<td align="right">1</td>
+<td align="right">61.490425</td>
+<td align="right">61.490425</td>
+<td align="right">61.490425</td>
+</tr>
+<tr class="odd">
+<td>boundary</td>
+<td align="right">3</td>
+<td align="right">76.853062</td>
+<td align="right">25.617687</td>
+<td align="right">25.617687</td>
+</tr>
+<tr class="even">
+<td>position</td>
+<td align="right">2</td>
+<td align="right">13.312585</td>
+<td align="right">6.656293</td>
+<td align="right">6.656293</td>
+</tr>
+<tr class="odd">
+<td>segment:stress</td>
+<td align="right">1</td>
+<td align="right">8.791986</td>
+<td align="right">8.791986</td>
+<td align="right">8.791986</td>
+</tr>
+<tr class="even">
+<td>segment:boundary</td>
+<td align="right">3</td>
+<td align="right">8.591819</td>
+<td align="right">2.863940</td>
+<td align="right">2.863940</td>
+</tr>
+<tr class="odd">
+<td>segment:position</td>
+<td align="right">2</td>
+<td align="right">8.956021</td>
+<td align="right">4.478010</td>
+<td align="right">4.478010</td>
+</tr>
+<tr class="even">
+<td>stress:boundary</td>
+<td align="right">3</td>
+<td align="right">13.692041</td>
+<td align="right">4.564014</td>
+<td align="right">4.564014</td>
+</tr>
+<tr class="odd">
+<td>stress:position</td>
+<td align="right">2</td>
+<td align="right">10.360280</td>
+<td align="right">5.180140</td>
+<td align="right">5.180140</td>
+</tr>
+<tr class="even">
+<td>boundary:position</td>
+<td align="right">6</td>
+<td align="right">27.632893</td>
+<td align="right">4.605482</td>
+<td align="right">4.605482</td>
+</tr>
+</tbody>
+</table>
 <pre class="r"><code>ranef(fitRandInter)</code></pre>
 <pre><code>## $lexeme
 ##       (Intercept)
@@ -989,31 +1073,167 @@ fitRandBoundary &lt;- glmer(schwa ~ segment + stress + boundary + position + ( 1
 fitRandBoundary &lt;- runAgain(fitRandBoundary)
 
 # not significant: both heute/gerne behave similar
-anova(fitRandBase, fitRandSegment)</code></pre>
-<div data-pagedtable="false">
-<script data-pagedtable-source type="application/json">
-{"columns":[{"label":["Df"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["AIC"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["BIC"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["logLik"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["deviance"],"name":[5],"type":["dbl"],"align":["right"]},{"label":["Chisq"],"name":[6],"type":["dbl"],"align":["right"]},{"label":["Chi Df"],"name":[7],"type":["dbl"],"align":["right"]},{"label":["Pr(>Chisq)"],"name":[8],"type":["dbl"],"align":["right"]}],"data":[{"1":"9","2":"3084.084","3":"3137.299","4":"-1533.042","5":"3066.084","6":"NA","7":"NA","8":"NA"},{"1":"11","2":"3084.067","3":"3149.108","4":"-1531.034","5":"3062.067","6":"4.017175","7":"2","8":"0.1341781"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
-  </script>
-</div>
+knitr::kable(anova(fitRandBase, fitRandSegment))</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th></th>
+<th align="right">Df</th>
+<th align="right">AIC</th>
+<th align="right">BIC</th>
+<th align="right">logLik</th>
+<th align="right">deviance</th>
+<th align="right">Chisq</th>
+<th align="right">Chi Df</th>
+<th align="right">Pr(&gt;Chisq)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>fitRandBase</td>
+<td align="right">9</td>
+<td align="right">3084.084</td>
+<td align="right">3137.299</td>
+<td align="right">-1533.042</td>
+<td align="right">3066.084</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="even">
+<td>fitRandSegment</td>
+<td align="right">11</td>
+<td align="right">3084.067</td>
+<td align="right">3149.108</td>
+<td align="right">-1531.034</td>
+<td align="right">3062.067</td>
+<td align="right">4.017175</td>
+<td align="right">2</td>
+<td align="right">0.1341781</td>
+</tr>
+</tbody>
+</table>
 <pre class="r"><code># the others are significant: heute/gerne behave different
-anova(fitRandBase, fitRandStress) </code></pre>
-<div data-pagedtable="false">
-<script data-pagedtable-source type="application/json">
-{"columns":[{"label":["Df"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["AIC"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["BIC"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["logLik"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["deviance"],"name":[5],"type":["dbl"],"align":["right"]},{"label":["Chisq"],"name":[6],"type":["dbl"],"align":["right"]},{"label":["Chi Df"],"name":[7],"type":["dbl"],"align":["right"]},{"label":["Pr(>Chisq)"],"name":[8],"type":["dbl"],"align":["right"]}],"data":[{"1":"9","2":"3084.084","3":"3137.299","4":"-1533.042","5":"3066.084","6":"NA","7":"NA","8":"NA"},{"1":"11","2":"3056.715","3":"3121.756","4":"-1517.358","5":"3034.715","6":"31.36906","7":"2","8":"1.542752e-07"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
-  </script>
-</div>
-<pre class="r"><code>anova(fitRandBase, fitRandPosition)</code></pre>
-<div data-pagedtable="false">
-<script data-pagedtable-source type="application/json">
-{"columns":[{"label":["Df"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["AIC"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["BIC"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["logLik"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["deviance"],"name":[5],"type":["dbl"],"align":["right"]},{"label":["Chisq"],"name":[6],"type":["dbl"],"align":["right"]},{"label":["Chi Df"],"name":[7],"type":["dbl"],"align":["right"]},{"label":["Pr(>Chisq)"],"name":[8],"type":["dbl"],"align":["right"]}],"data":[{"1":"9","2":"3084.084","3":"3137.299","4":"-1533.042","5":"3066.084","6":"NA","7":"NA","8":"NA"},{"1":"14","2":"3038.880","3":"3121.660","4":"-1505.440","5":"3010.880","6":"55.20384","7":"5","8":"1.185203e-10"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
-  </script>
-</div>
-<pre class="r"><code>anova(fitRandBase, fitRandBoundary)</code></pre>
-<div data-pagedtable="false">
-<script data-pagedtable-source type="application/json">
-{"columns":[{"label":["Df"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["AIC"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["BIC"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["logLik"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["deviance"],"name":[5],"type":["dbl"],"align":["right"]},{"label":["Chisq"],"name":[6],"type":["dbl"],"align":["right"]},{"label":["Chi Df"],"name":[7],"type":["dbl"],"align":["right"]},{"label":["Pr(>Chisq)"],"name":[8],"type":["dbl"],"align":["right"]}],"data":[{"1":"9","2":"3084.084","3":"3137.299","4":"-1533.042","5":"3066.084","6":"NA","7":"NA","8":"NA"},{"1":"18","2":"2945.959","3":"3052.389","4":"-1454.979","5":"2909.959","6":"156.1256","7":"9","8":"4.735068e-29"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
-  </script>
-</div>
+knitr::kable(anova(fitRandBase, fitRandStress) )</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th></th>
+<th align="right">Df</th>
+<th align="right">AIC</th>
+<th align="right">BIC</th>
+<th align="right">logLik</th>
+<th align="right">deviance</th>
+<th align="right">Chisq</th>
+<th align="right">Chi Df</th>
+<th align="right">Pr(&gt;Chisq)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>fitRandBase</td>
+<td align="right">9</td>
+<td align="right">3084.084</td>
+<td align="right">3137.299</td>
+<td align="right">-1533.042</td>
+<td align="right">3066.084</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="even">
+<td>fitRandStress</td>
+<td align="right">11</td>
+<td align="right">3056.715</td>
+<td align="right">3121.756</td>
+<td align="right">-1517.358</td>
+<td align="right">3034.715</td>
+<td align="right">31.36906</td>
+<td align="right">2</td>
+<td align="right">2e-07</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>knitr::kable(anova(fitRandBase, fitRandPosition))</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th></th>
+<th align="right">Df</th>
+<th align="right">AIC</th>
+<th align="right">BIC</th>
+<th align="right">logLik</th>
+<th align="right">deviance</th>
+<th align="right">Chisq</th>
+<th align="right">Chi Df</th>
+<th align="right">Pr(&gt;Chisq)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>fitRandBase</td>
+<td align="right">9</td>
+<td align="right">3084.084</td>
+<td align="right">3137.299</td>
+<td align="right">-1533.042</td>
+<td align="right">3066.084</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="even">
+<td>fitRandPosition</td>
+<td align="right">14</td>
+<td align="right">3038.880</td>
+<td align="right">3121.660</td>
+<td align="right">-1505.440</td>
+<td align="right">3010.880</td>
+<td align="right">55.20384</td>
+<td align="right">5</td>
+<td align="right">0</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>knitr::kable(anova(fitRandBase, fitRandBoundary))</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th></th>
+<th align="right">Df</th>
+<th align="right">AIC</th>
+<th align="right">BIC</th>
+<th align="right">logLik</th>
+<th align="right">deviance</th>
+<th align="right">Chisq</th>
+<th align="right">Chi Df</th>
+<th align="right">Pr(&gt;Chisq)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>fitRandBase</td>
+<td align="right">9</td>
+<td align="right">3084.084</td>
+<td align="right">3137.299</td>
+<td align="right">-1533.042</td>
+<td align="right">3066.084</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="even">
+<td>fitRandBoundary</td>
+<td align="right">18</td>
+<td align="right">2945.959</td>
+<td align="right">3052.389</td>
+<td align="right">-1454.979</td>
+<td align="right">2909.959</td>
+<td align="right">156.1256</td>
+<td align="right">9</td>
+<td align="right">0</td>
+</tr>
+</tbody>
+</table>
 <p>Direction of random effects is alike to the differences between the two logistic regression models</p>
 <pre class="r"><code>ranef(fitRandSegment)</code></pre>
 <pre><code>## $lexeme
@@ -1129,7 +1349,7 @@ summary(fitRand)</code></pre>
 ## [13] nlme_3.1-131     htmltools_0.3.6  yaml_2.1.14      rprojroot_1.2   
 ## [17] digest_0.6.12    tibble_1.3.4     nloptr_1.0.4     evaluate_0.10.1 
 ## [21] rmarkdown_1.6    stringi_1.1.5    compiler_3.4.2   cellranger_1.1.0
-## [25] backports_1.1.1  jsonlite_1.5</code></pre>
+## [25] backports_1.1.1</code></pre>
 </div>
 
 
