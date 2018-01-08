@@ -4,7 +4,7 @@ author: "Michael Cysouw"
 date: "`r Sys.Date()`"
 output:
   html_document:
-    df_print: paged
+    pdf_print: paged
 ---
 
 ```{r}
@@ -17,7 +17,7 @@ library(lme4)
 Read the data from the Excel file. Clean various typos and mark data consistently.
 
 ```{r}
-data <- read_excel("Schwa annotated data.xls")
+data <- read_excel("sources/Schwa annotated data.xls")
 
 data[data=="0.000000"] <- NA
 data[data=="?"] <- NA
